@@ -18,13 +18,20 @@ gotoApp.get(
 		const browser = await Browser.getInstance({});
 		const page = browser.page;
 
-		for (let counter = 0; counter < 3; counter++) {
+		const maxTries = 3;
+
+		for (let counter = 1; counter <= maxTries; counter++) {
 			try {
 				await page.goto(url, { waitUntil: "networkidle2", timeout: 10_000 });
 				break;
 			} catch (e) {
 				if (e instanceof Error && e.name === "TimeoutError") {
 					console.warn("Got TimeoutError, retrying...", counter);
+
+					if (counter === maxTries) {
+						console.error("Max retries reached. Failing.");
+						throw e;
+					}
 				} else {
 					console.error("Failed to navigate to the page:", e);
 					throw e;
