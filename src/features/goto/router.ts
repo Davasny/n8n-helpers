@@ -18,7 +18,33 @@ gotoApp.get(
     const browser = await Browser.getInstance({});
     const page = browser.page;
 
-    await page.goto(url, { waitUntil: "networkidle2" });
+    try {
+      await page.goto(url, { waitUntil: "networkidle2" });
+    } catch (error) {
+      const isNavigationTimeout =
+        error instanceof Error &&
+        error.name === "TimeoutError" &&
+        error.message.includes("Navigation timeout");
+
+      if (isNavigationTimeout) {
+        const readyState = await page
+          .evaluate(() => document.readyState)
+          .catch(() => null);
+
+        if (
+          (readyState === "complete" || readyState === "interactive") &&
+          page.url() !== "about:blank"
+        ) {
+          console.warn(
+            `Navigation timed out waiting for network idle. Continuing with document in '${readyState}' state for ${page.url()}.`,
+          );
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
 
     const html = await page.content();
     browser.touch();
