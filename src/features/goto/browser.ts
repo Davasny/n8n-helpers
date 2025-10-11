@@ -6,6 +6,8 @@ import {
 
 export class Browser {
 	private static instance: Browser | null = null;
+	private static shutdownTimer: ReturnType<typeof setTimeout> | null = null;
+	private static readonly INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000;
 	public readonly page: PageWithCursor;
 	public readonly browser: ConnectResult["browser"];
 
@@ -20,6 +22,7 @@ export class Browser {
 		headless?: boolean;
 	}): Promise<Browser> {
 		if (Browser.instance) {
+			Browser.instance.touch();
 			return Browser.instance;
 		}
 
@@ -34,13 +37,53 @@ export class Browser {
 		console.log("Spawned browser with arguments:", args.join(" "));
 
 		Browser.instance = new Browser(page, browser);
+		Browser.instance.touch();
 
 		return Browser.instance;
 	}
 
+	private static scheduleShutdown(): void {
+		Browser.clearShutdownTimer();
+		Browser.shutdownTimer = setTimeout(() => {
+			const activeInstance = Browser.instance;
+			if (!activeInstance) {
+				return;
+			}
+
+			activeInstance.shutdown().catch((error) => {
+				console.error("Error shutting down idle browser:", error);
+			});
+		}, Browser.INACTIVITY_TIMEOUT_MS);
+	}
+
+	private static clearShutdownTimer(): void {
+		if (Browser.shutdownTimer) {
+			clearTimeout(Browser.shutdownTimer);
+			Browser.shutdownTimer = null;
+		}
+	}
+
+	public touch(): void {
+		Browser.scheduleShutdown();
+	}
+
 	public async shutdown(): Promise<void> {
-		await this.page.close();
-		await this.browser.close();
-		Browser.instance = null;
+		Browser.clearShutdownTimer();
+
+		try {
+			await this.page.close();
+		} catch (error) {
+			console.error("Error closing browser page:", error);
+		}
+
+		try {
+			await this.browser.close();
+		} catch (error) {
+			console.error("Error closing browser instance:", error);
+		}
+
+		if (Browser.instance === this) {
+			Browser.instance = null;
+		}
 	}
 }

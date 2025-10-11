@@ -1,5 +1,6 @@
 import * as v from "valibot";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
+import { Browser } from "./browser";
 import { gotoApp } from "./router";
 
 const responseSchema = v.object({
@@ -7,6 +8,11 @@ const responseSchema = v.object({
 });
 
 describe("/goto", async () => {
+	afterAll(async () => {
+		const browser = await Browser.getInstance({});
+		await browser.shutdown();
+	});
+
 	it("Opens a static page", async () => {
 		const res = await gotoApp.request("/goto?url=https://example.com");
 

@@ -21,7 +21,7 @@ gotoApp.get(
     await page.goto(url, { waitUntil: "networkidle2" });
 
     const html = await page.content();
-    await browser.shutdown();
+    browser.touch();
 
     return c.json({ pageContent: html });
   },
