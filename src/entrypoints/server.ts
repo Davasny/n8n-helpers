@@ -7,6 +7,8 @@ import { simplifyHtmlApp } from "../features/simplify-html/router";
 export const app = new Hono();
 app.use(logger());
 
+app.get("/", async (c) => c.json("Hello from the helpers"));
+
 app.route("/", simplifyHtmlApp);
 app.route("/", gotoApp);
 
