@@ -1,0 +1,33 @@
+{
+	"name": "n8n-helpers",
+	"version": "1.0.0",
+	"description": "",
+	"keywords": [],
+	"license": "MIT",
+	"author": "",
+	"type": "module",
+	"main": "dist/server.js",
+	"scripts": {
+		"start": "tsx src/entrypoints/server.ts",
+		"dev": "tsx --watch src/entrypoints/server.ts"
+	},
+	"dependencies": {
+		"@hono/node-server": "1.19.5",
+		"@hono/valibot-validator": "0.5.3",
+		"@mozilla/readability": "0.6.0",
+		"hono": "4.9.10",
+		"jsdom": "27.0.0",
+		"puppeteer-real-browser": "1.4.4",
+		"tsx": "4.20.6",
+		"valibot": "1.1.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.5",
+		"@types/jsdom": "27.0.0",
+		"@types/node": "24.7.0",
+		"knip": "5.64.3",
+		"typescript": "5.9.3",
+		"vitest": "3.2.4"
+	},
+	"packageManager": "pnpm@10.17.1"
+}
