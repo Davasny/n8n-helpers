@@ -36,8 +36,6 @@ gotoApp.get(
 					console.error("Failed to navigate to the page:", e);
 					throw e;
 				}
-
-				await page.close();
 			}
 		}
 
