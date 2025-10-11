@@ -27,6 +27,10 @@ gotoApp.get(
         error.message.includes("Navigation timeout");
 
       if (isNavigationTimeout) {
+				console.warn(
+					`Navigation to ${url} timed out waiting for network idle. Checking document readiness...`,
+				);
+
         const readyState = await page
           .evaluate(() => document.readyState)
           .catch(() => null);
