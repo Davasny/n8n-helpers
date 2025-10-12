@@ -46,11 +46,13 @@ gotoApp.get(
 			}
 
 			const html = await page.content();
-			browser.touch();
+			await browser.shutdown()
 
 			return c.json({ pageContent: html });
 		} catch (error) {
 			await captureFailureScreenshot(page, url);
+			await browser.shutdown()
+
 			throw error;
 		}
 	},
