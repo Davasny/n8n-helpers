@@ -19,6 +19,7 @@
 		"jsdom": "27.0.0",
 		"puppeteer-real-browser": "1.4.4",
 		"tsx": "4.20.6",
+		"uuid": "13.0.0",
 		"valibot": "1.1.0"
 	},
 	"devDependencies": {
