@@ -6,7 +6,7 @@ import { convertExcelToCsv } from "./convert-excel-to-csv";
 export const convertApp = new Hono();
 
 const conversionSchema = v.object({
-  from: v.picklist(["xlsx", "xls"]),
+  from: v.picklist(["xlsx"]),
   to: v.pipe(v.string(), v.length(3)),
   file: v.object({
     name: v.pipe(v.string(), v.minLength(1)),
@@ -21,7 +21,7 @@ convertApp.post(
     const { from, to, file } = c.req.valid("json");
     const { name, base64 } = file;
 
-    if (["xlsx", "xls"].includes(from) && to === "csv") {
+    if (from === "xlsx" && to === "csv") {
       const csv = await convertExcelToCsv(base64);
 
       return c.json(
