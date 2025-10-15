@@ -1,13 +1,14 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
-export function convertExcelToCsv(base64: string) {
+export async function convertExcelToCsv(base64: string) {
   const buffer = Buffer.from(base64, "base64");
 
-  const workbook = XLSX.read(buffer, { type: "buffer" });
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer.buffer);
 
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
+  const csvBuffer = await workbook.csv.writeBuffer({
+    sheetId: 1,
+  });
 
-  const csv = XLSX.utils.sheet_to_csv(worksheet);
-  return csv;
+  return csvBuffer.toString();
 }

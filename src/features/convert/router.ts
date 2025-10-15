@@ -17,12 +17,12 @@ const conversionSchema = v.object({
 convertApp.post(
   "/convert/base64",
   vValidator("json", conversionSchema),
-  (c) => {
+  async (c) => {
     const { from, to, file } = c.req.valid("json");
     const { name, base64 } = file;
 
     if (["xlsx", "xls"].includes(from) && to === "csv") {
-      const csv = convertExcelToCsv(base64);
+      const csv = await convertExcelToCsv(base64);
 
       return c.json(
         {
