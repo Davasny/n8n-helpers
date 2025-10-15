@@ -1,12 +1,12 @@
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
 import * as v from "valibot";
-import { convertExcelToCsv } from "./convertExcelToCsv";
+import { convertExcelToCsv } from "./convert-excel-to-csv";
 
 export const convertApp = new Hono();
 
 const conversionSchema = v.object({
-  from: v.pipe(v.string(), v.maxLength(4)),
+  from: v.picklist(["xlsx", "xls"]),
   to: v.pipe(v.string(), v.length(3)),
   file: v.object({
     name: v.pipe(v.string(), v.minLength(1)),
@@ -21,7 +21,7 @@ convertApp.post(
     const { from, to, file } = c.req.valid("json");
     const { name, base64 } = file;
 
-    if ((from === "xlsx" || from === "xls") && to === "csv") {
+    if (["xlsx", "xls"].includes(from) && to === "csv") {
       const csv = convertExcelToCsv(base64);
 
       return c.json(
