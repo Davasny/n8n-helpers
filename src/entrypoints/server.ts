@@ -10,9 +10,9 @@ app.use(logger());
 
 app.get("/", async (c) => c.json({ msg: "Hello from the helpers" }));
 
-app.route("/", convertApp);
 app.route("/", simplifyHtmlApp);
 app.route("/", gotoApp);
+app.route("/", convertApp);
 
 serve(
   {
