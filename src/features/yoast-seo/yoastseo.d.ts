@@ -171,7 +171,7 @@ declare module "yoastseo" {
     identifier: string;
     score: number;
     text: string;
-    marks: any[]; // results of Mark#serialize()
+    marks: unknown[]; // results of Mark#serialize()
     _hasBetaBadge: boolean;
     _hasJumps: boolean;
     _hasAIFixes: boolean;
@@ -210,9 +210,9 @@ declare module "yoastseo" {
     getIdentifier(): string;
 
     // Marker (pure function returning marks for a given Paper)
-    setMarker(marker: (...args: any[]) => any): void;
+    setMarker(marker: (...args: unknown[]) => unknown): void;
     hasMarker(): boolean;
-    getMarker(): (...args: any[]) => any;
+    getMarker(): (...args: unknown[]) => unknown;
 
     // Booleans about marks/badges/jumps/ai fixes
     setHasMarks(hasMarks: boolean): void;
@@ -251,7 +251,7 @@ declare module "yoastseo" {
     name: string;
 
     /** This node's attributes. */
-    attributes: Record<string, any>;
+    attributes: Record<string, unknown>;
 
     /** This node's child nodes. */
     childNodes: Array<Node | Text>;
@@ -269,9 +269,9 @@ declare module "yoastseo" {
      */
     constructor(
       name: string,
-      attributes?: Record<string, any>,
+      attributes?: Record<string, unknown>,
       childNodes?: Array<Node | Text>,
-      sourceCodeLocationInfo?: Record<string, any>,
+      sourceCodeLocationInfo?: Record<string, unknown>,
     );
 
     /**
@@ -323,7 +323,7 @@ declare module "yoastseo" {
     permalink?: string;
     date?: string;
     wpBlocks?: object[];
-    customData?: Record<string, any>;
+    customData?: Record<string, unknown>;
     textTitle?: string | null;
     writingDirection?: WritingDirection;
     isFrontPage?: boolean;
@@ -343,7 +343,7 @@ declare module "yoastseo" {
     permalink: string;
     date: string;
     wpBlocks: object[];
-    customData: Record<string, any>;
+    customData: Record<string, unknown>;
     textTitle: string;
     writingDirection: WritingDirection;
     isFrontPage: boolean;
@@ -419,7 +419,7 @@ declare module "yoastseo" {
 
     /** Custom data */
     hasCustomData(): boolean;
-    getCustomData(): Record<string, any>;
+    getCustomData(): Record<string, unknown>;
 
     /** Text title */
     hasTextTitle(): boolean;
