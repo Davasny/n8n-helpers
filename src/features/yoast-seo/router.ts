@@ -1,13 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
 import * as v from "valibot";
-import {
-  type AssessmentResult,
-  assessments,
-  assessors,
-  interpreters,
-  Paper,
-} from "yoastseo";
+import * as yoast from "yoastseo";
 import getResearcher from "./utils/get-researcher";
 import { removeLastAnchor } from "./utils/remove-last-anchor";
 
@@ -26,9 +20,14 @@ yoastSeoApp.post(
   "/yoast-seo",
   vValidator("json", yoastSeoPayloadSchema),
   async (c) => {
+    const normalizeCtor = <T extends new (...args: any[]) => any>(value: any): T | null => {
+      const maybe = value?.default ?? value;
+      return typeof maybe === "function" ? (maybe as T) : null;
+    };
+
     const { text, keyword, slug, title, description } = c.req.valid("json");
 
-    const paper = new Paper(text, {
+    const paper = new yoast.Paper(text, {
       title,
       description,
       keyword,
@@ -36,13 +35,14 @@ yoastSeoApp.post(
       locale: "en_US",
     });
 
-    const { SEOAssessor, ContentAssessor, ...restAssessors } = assessors;
+    const { SEOAssessor, ContentAssessor, ...restAssessors } = yoast.assessors as Record<string, unknown> as any;
 
     const researcherClass = getResearcher("en");
     const researcher = new researcherClass(paper);
 
-    const seoAssessor = new SEOAssessor(researcher);
-    for (const [key, value] of Object.entries(assessments.seo)) {
+    const SEOAssessorCtor = normalizeCtor<typeof SEOAssessor>(SEOAssessor) ?? (SEOAssessor as any);
+    const seoAssessor = new SEOAssessorCtor(researcher);
+    for (const [key, value] of Object.entries(yoast.assessments.seo)) {
       // both assessments are deprecated
       if (
         key === "KeywordDensityAssessment" ||
@@ -51,17 +51,20 @@ yoastSeoApp.post(
         continue;
       }
 
-      // @ts-expect-error
-      seoAssessor.addAssessment(key, new value());
+      const Ctor = normalizeCtor(value);
+      if (!Ctor) continue;
+      seoAssessor.addAssessment(key, new Ctor());
     }
 
-    const contentAssessor = new ContentAssessor(researcher);
-    for (const [key, value] of Object.entries(assessments.readability)) {
-      // @ts-expect-error
-      contentAssessor.addAssessment(key, new value());
+    const ContentAssessorCtor = normalizeCtor<typeof ContentAssessor>(ContentAssessor) ?? (ContentAssessor as any);
+    const contentAssessor = new ContentAssessorCtor(researcher);
+    for (const [key, value] of Object.entries(yoast.assessments.readability)) {
+      const Ctor = normalizeCtor(value);
+      if (!Ctor) continue;
+      contentAssessor.addAssessment(key, new Ctor());
     }
 
-    const results: AssessmentResult[] = [];
+    const results: yoast.AssessmentResult[] = [];
 
     for (const [assessorName, assessorClass] of Object.entries(restAssessors)) {
       // product assessors are part of paid features
@@ -70,7 +73,12 @@ yoastSeoApp.post(
       }
 
       try {
-        const resultAssessor = new assessorClass(researcher);
+        const Ctor = normalizeCtor(assessorClass);
+        if (!Ctor) {
+          console.warn(`[yoast-seo] Skipping ${assessorName}: not a constructor`);
+          continue;
+        }
+        const resultAssessor = new Ctor(researcher);
         resultAssessor.assess(paper);
 
         const rawResults = resultAssessor.getValidResults();
@@ -93,7 +101,7 @@ yoastSeoApp.post(
     const uniqueErrors = Array.from(
       new Set(
         results
-          .map((r) => ({ ...r, rating: interpreters.scoreToRating(r.score) }))
+          .map((r) => ({ ...r, rating: yoast.interpreters.scoreToRating(r.score) }))
           .filter((r) => r.rating !== "good" && r.rating !== "ok")
           .map((r) => r.text),
       ),
