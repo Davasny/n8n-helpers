@@ -29,7 +29,7 @@ convertApp.post(
           data: csv,
           filename: name.replace(/\.(xlsx|xls)$/, ".csv"),
         },
-        200
+        200,
       );
     }
 
@@ -37,7 +37,7 @@ convertApp.post(
       {
         message: `Conversion from ${from} to ${to} is not supported`,
       },
-      400
+      400,
     );
-  }
+  },
 );

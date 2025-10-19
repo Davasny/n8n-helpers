@@ -23,5 +23,5 @@ serve(
   },
   () => {
     console.info("Server started on :3000");
-  }
+  },
 );

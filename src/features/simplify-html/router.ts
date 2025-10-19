@@ -39,4 +39,3 @@ simplifyHtmlApp.post(
     });
   },
 );
-
