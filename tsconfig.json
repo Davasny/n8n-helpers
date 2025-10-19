@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
 
+    "allowJs": true,
+
     "module": "nodenext",
     "moduleResolution": "bundler",
     "target": "esnext",
