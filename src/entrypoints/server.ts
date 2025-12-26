@@ -30,9 +30,9 @@ app.route("/", yoastSeoMcpApp);
 serve(
   {
     fetch: app.fetch,
-    port: 3012,
+    port: 3000,
   },
   () => {
-    console.info("Server started on :3012");
+    console.info("Server started on :3000");
   },
 );
